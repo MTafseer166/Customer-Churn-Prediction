@@ -1,0 +1,43 @@
+# End-to-End Customer Churn Prediction System
+
+**Course:** Artificial Intelligence – Final Project (Batch 3), Question 1
+**Goal:** Predict whether a telecom customer will churn (leave) from historical account data.
+
+## Dataset
+IBM *Telco Customer Churn* – 7,043 customers, 20 features (demographics, services, contract, billing) + `Churn` target. 26.5 % of customers churn (imbalanced).
+
+## Approach
+1. **EDA** (Pandas + Matplotlib): target balance, churn by contract/internet/payment, tenure & charge distributions, correlations.
+2. **Missing values:** `TotalCharges` had 11 blank values (all brand-new customers, tenure 0) → converted to numeric and filled with the **median**. `customerID` dropped.
+3. **Encoding:** binary Yes/No columns → label encoding (0/1); multi-category columns → one-hot (`drop_first=True`).
+4. **Split & scaling:** stratified 80/20 split; `StandardScaler` fitted on **train only** (no leakage) for `tenure`, `MonthlyCharges`, `TotalCharges`.
+5. **Models:** Logistic Regression and KNN (K = 35, chosen by 5-fold CV on the training set).
+6. **Evaluation:** Accuracy, Precision, Recall, F1, confusion matrix (+ ROC-AUC).
+7. **Overfitting vs underfitting:** KNN train-vs-test F1 across K, plus a train/test gap table.
+8. **Bonus:** coefficient interpretation and a class-balanced Logistic Regression to raise recall.
+
+## Results (test set, 1,409 customers)
+| Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
+|---|---|---|---|---|---|
+| Logistic Regression | 0.8055 | 0.6572 | 0.5588 | 0.6040 | 0.8421 |
+| KNN (k=35) | 0.7942 | 0.6173 | 0.5909 | 0.6038 | 0.8338 |
+| Logistic Regression (balanced) | 0.7388 | 0.5052 | 0.7834 | 0.6143 | 0.8417 |
+
+**Takeaways:** F1 is tied between the two baseline models; Logistic Regression is better on accuracy/precision/AUC, shows no train–test gap, and is explainable, so it is the recommended model. Churn is driven by short tenure, month-to-month contracts, fibre-optic service and electronic-check payment. Class balancing lifts recall from ~56 % to ~78 %.
+
+## Files
+| File | Description |
+|---|---|
+| `churn_prediction.ipynb` | Full executed notebook (code, outputs, written explanations) |
+| `churn_prediction.html` | Same notebook as a read-only web page |
+| `evaluation_summary.csv` | Evaluation summary table |
+| `figures/` | 8 PNG visualizations |
+| `telco.csv` | Dataset |
+
+## Run it
+```bash
+pip install pandas numpy matplotlib seaborn scikit-learn jupyter
+jupyter notebook churn_prediction.ipynb
+```
+
+*Portfolio line:* "Built a complete churn prediction ML pipeline with preprocessing, classification models, and evaluation."
